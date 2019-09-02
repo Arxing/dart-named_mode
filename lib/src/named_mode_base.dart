@@ -8,6 +8,10 @@ class NamedMode {
     return values.firstWhere((o) => o.value == value, orElse: () => unknown);
   }
 
+  static NamedMode parseOn(String src){
+    return values.firstWhere((m) => RegExp(m.value).hasMatch(src), orElse: () => NamedMode.unknown);
+  }
+
   String get value => _value;
 
   String get name => _name;
@@ -26,6 +30,7 @@ class NamedMode {
     switch (this) {
       case an_apple:
       case AN_APPLE:
+      case An_Apple:
         return input.split('_').map((o) => o.toLowerCase()).toList();
       case anApple:
         var matches = RegExp('^($_LOWER_WORD)(($_FIRST_UPPER_WORD)*)\$').allMatches(input).first;
@@ -47,6 +52,10 @@ class NamedMode {
   ///
   static const String _AN_APPLE = '^($_UPPER_WORD)(_$_UPPER_WORD)*\$';
   static const AN_APPLE = NamedMode._(_AN_APPLE, 'AN_APPLE');
+
+  ///
+  static const String _An_Apple = '^($_FIRST_UPPER_WORD)(_$_FIRST_UPPER_WORD)*\$';
+  static const An_Apple = NamedMode._(_An_Apple, 'An_Apple');
 
   ///
   static const String _anApple = '^($_LOWER_WORD)($_FIRST_UPPER_WORD)*\$';
@@ -79,6 +88,10 @@ String renameTo__AN_APPLE(String src) {
   return renameToOtherMode(src, NamedMode.AN_APPLE);
 }
 
+String renameTo__An_Apple(String src) {
+  return renameToOtherMode(src, NamedMode.An_Apple);
+}
+
 String renameTo__anApple(String src) {
   return renameToOtherMode(src, NamedMode.anApple);
 }
@@ -95,23 +108,25 @@ String combineWithNamedMode(List<String> segments, NamedMode mode) {
   if (segments.isEmpty) return null;
   switch (mode) {
     case NamedMode.an_apple:
-      return segments.map((o) => changeFirstChar(o, toUpper: false)).join('_');
+      return segments.map((o) => replaceFirstChar(o, toUpper: false)).join('_');
     case NamedMode.AN_APPLE:
       return segments.map((o) => o.toUpperCase()).join('_');
+    case NamedMode.An_Apple:
+      return segments.map((o) => replaceFirstChar(o, toUpper: true)).join('_');
     case NamedMode.anApple:
       return segments.length == 1
-          ? changeFirstChar(segments[0], toUpper: false)
-          : changeFirstChar(segments[0], toUpper: false) +
-          segments.skip(1).map((o) => changeFirstChar(o, toUpper: true)).join('');
+          ? replaceFirstChar(segments[0], toUpper: false)
+          : replaceFirstChar(segments[0], toUpper: false) +
+              segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
     case NamedMode.AnApple:
       return segments.length == 1
-          ? changeFirstChar(segments[0], toUpper: true)
-          : changeFirstChar(segments[0], toUpper: true) + segments.skip(1).map((o) => changeFirstChar(o, toUpper: true)).join('');
+          ? replaceFirstChar(segments[0], toUpper: true)
+          : replaceFirstChar(segments[0], toUpper: true) + segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
   }
   return null;
 }
 
-String changeFirstChar(String s, {bool toUpper = true}) {
+String replaceFirstChar(String s, {bool toUpper = true}) {
   if (s == null || s.isEmpty) return '';
   if (s.length == 1) return toUpper ? s.toUpperCase() : s.toLowerCase();
   return (toUpper ? s.toUpperCase() : s.toLowerCase()).substring(0, 1) + s.substring(1);
