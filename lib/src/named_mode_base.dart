@@ -1,8 +1,11 @@
+import 'dart:math';
+
 class NamedMode {
   final String _value;
   final String _name;
+  final int _priority;
 
-  const NamedMode._(this._value, this._name);
+  const NamedMode._(this._value, this._name, this._priority);
 
   factory NamedMode(String value) {
     return values.firstWhere((o) => o.value == value, orElse: () => unknown);
@@ -26,23 +29,23 @@ class NamedMode {
 
   static const String _ANY_WORD = '[a-zA-Z0-9\$_]+';
 
-  static List<NamedMode> get values => [an_apple, AN_APPLE, anApple, AnApple];
+  static List<NamedMode> get values => [anApple, AnApple, an_apple, AN_APPLE];
 
-  static List<String> get names => [an_apple.name, AN_APPLE.name, anApple.name, AnApple.name];
+  static List<String> get names => [anApple.name, AnApple.name, an_apple.name, AN_APPLE.name];
 
   List<String> split(String input) {
     switch (this) {
       case an_apple:
       case AN_APPLE:
       case An_Apple:
-        return input.split('_').map((o) => o.toLowerCase()).toList();
+        return input.split('_').toList();
       case anApple:
         var matches = RegExp('^($_LOWER_WORD)(($_FIRST_UPPER_WORD)*)\$').allMatches(input).first;
         String head = matches.group(1);
         String fullTail = matches.group(2);
         var allMatches2 = RegExp('($_FIRST_UPPER_WORD)').allMatches(fullTail);
         var tails = allMatches2.map((o) => o.group(1)).toList();
-        return ([head]..addAll(tails)).map((o) => o.toLowerCase()).toList();
+        return ([head]..addAll(tails)).toList();
       case AnApple:
         return RegExp('($_FIRST_UPPER_WORD)').allMatches(input).map((o) => o.group(1)).toList();
     }
@@ -51,27 +54,27 @@ class NamedMode {
 
   ///
   static const String _an_apple = '^($_ANY_WORD_BEGIN_NOT_NUMBER)(_$_ANY_WORD)*\$';
-  static const an_apple = NamedMode._(_an_apple, 'an_apple');
+  static const an_apple = NamedMode._(_an_apple, 'an_apple', 50);
 
   ///
   static const String _AN_APPLE = '^($_UPPER_WORD)(_$_UPPER_WORD)*\$';
-  static const AN_APPLE = NamedMode._(_AN_APPLE, 'AN_APPLE');
+  static const AN_APPLE = NamedMode._(_AN_APPLE, 'AN_APPLE', 80);
 
   ///
   static const String _An_Apple = '^($_FIRST_UPPER_WORD)(_$_FIRST_UPPER_WORD*)*\$';
-  static const An_Apple = NamedMode._(_An_Apple, 'An_Apple');
+  static const An_Apple = NamedMode._(_An_Apple, 'An_Apple', 70);
 
   ///
   static const String _anApple = '^($_LOWER_WORD)($_FIRST_UPPER_WORD)*\$';
-  static const anApple = NamedMode._(_anApple, 'anApple');
+  static const anApple = NamedMode._(_anApple, 'anApple', 90);
 
   ///
   static const String _AnApple = '^($_FIRST_UPPER_WORD)+\$';
-  static const AnApple = NamedMode._(_AnApple, 'AnApple');
+  static const AnApple = NamedMode._(_AnApple, 'AnApple', 100);
 
   ///
   static const String _unknown = '';
-  static const unknown = NamedMode._(_unknown, 'unknown');
+  static const unknown = NamedMode._(_unknown, 'unknown', 0);
 }
 
 String renameToOtherMode(String src, NamedMode mode) {
@@ -105,7 +108,30 @@ String renameTo__AnApple(String src) {
 }
 
 NamedMode resolveNamedMode(String src) {
-  return NamedMode.values.firstWhere((m) => RegExp(m.value).hasMatch(src), orElse: () => NamedMode.unknown);
+  try {
+    return NamedMode.values
+        .where((m) => RegExp(m.value).hasMatch(src))
+        .reduce((current, next) => current._priority > next._priority ? current : next);
+  } catch (e) {
+    return NamedMode.unknown;
+  }
+}
+
+List<String> autoSplit(String src, {NamedMode parentNamedMode = NamedMode.unknown, bool recursive = true}) {
+  NamedMode namedMode = resolveNamedMode(src);
+  if (namedMode == parentNamedMode) return [src];
+  if (namedMode == NamedMode.unknown) return [src];
+  List<String> segments = namedMode.split(src);
+  List<String> result = [];
+  if (recursive) {
+    for (String value in segments) {
+      List<String> childSplits = autoSplit(value, parentNamedMode: parentNamedMode, recursive: recursive);
+      result.addAll(childSplits);
+    }
+  } else {
+    result.addAll(segments);
+  }
+  return result;
 }
 
 String combineWithNamedMode(List<String> segments, NamedMode mode) {
