@@ -46,7 +46,7 @@ class NamedMode {
   }
 
   ///
-  static const String _an_apple = '^($_LOWER_WORD)(_$_LOWER_WORD)*\$';
+  static const String _an_apple = '^($_LOWER_WORD($_FIRST_UPPER_WORD)*)(_$_LOWER_WORD($_FIRST_UPPER_WORD)*)*\$';
   static const an_apple = NamedMode._(_an_apple, 'an_apple');
 
   ///
