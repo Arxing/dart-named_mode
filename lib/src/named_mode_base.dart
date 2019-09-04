@@ -8,7 +8,7 @@ class NamedMode {
     return values.firstWhere((o) => o.value == value, orElse: () => unknown);
   }
 
-  static NamedMode parseOn(String src){
+  static NamedMode parseOn(String src) {
     return values.firstWhere((m) => RegExp(m.value).hasMatch(src), orElse: () => NamedMode.unknown);
   }
 
@@ -21,6 +21,10 @@ class NamedMode {
   static const String _UPPER_WORD = '[A-Z\$][A-Z0-9]*';
 
   static const String _FIRST_UPPER_WORD = '[A-Z\$][a-z0-9]*';
+
+  static const String _ANY_WORD_BEGIN_NOT_NUMBER = '[a-zA-Z\$_][a-zA-Z0-9\$_]*';
+
+  static const String _ANY_WORD = '[a-zA-Z0-9\$_]+';
 
   static List<NamedMode> get values => [an_apple, AN_APPLE, anApple, AnApple];
 
@@ -46,7 +50,7 @@ class NamedMode {
   }
 
   ///
-  static const String _an_apple = '^($_LOWER_WORD($_FIRST_UPPER_WORD)*)(_$_LOWER_WORD($_FIRST_UPPER_WORD)*)*\$';
+  static const String _an_apple = '^($_ANY_WORD_BEGIN_NOT_NUMBER)(_$_ANY_WORD)*\$';
   static const an_apple = NamedMode._(_an_apple, 'an_apple');
 
   ///
@@ -54,7 +58,7 @@ class NamedMode {
   static const AN_APPLE = NamedMode._(_AN_APPLE, 'AN_APPLE');
 
   ///
-  static const String _An_Apple = '^($_FIRST_UPPER_WORD)(_$_FIRST_UPPER_WORD)*\$';
+  static const String _An_Apple = '^($_FIRST_UPPER_WORD)(_$_FIRST_UPPER_WORD*)*\$';
   static const An_Apple = NamedMode._(_An_Apple, 'An_Apple');
 
   ///
@@ -121,7 +125,8 @@ String combineWithNamedMode(List<String> segments, NamedMode mode) {
     case NamedMode.AnApple:
       return segments.length == 1
           ? replaceFirstChar(segments[0], toUpper: true)
-          : replaceFirstChar(segments[0], toUpper: true) + segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
+          : replaceFirstChar(segments[0], toUpper: true) +
+              segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
   }
   return null;
 }
