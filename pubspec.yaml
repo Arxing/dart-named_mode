@@ -1,6 +1,6 @@
 name: named_mode
 description: A library to translate class name, variable name and file name into other named mode easily.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/Arxing/dart-named_mode
 author: Arxing <meiswind711108@gmail.com>
 

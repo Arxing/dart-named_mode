@@ -1,6 +1,64 @@
+## Download
+
+```yaml
+dependencies:
+  named_mode: ^1.0.1
+```
+
+## Import
+```dart
+import 'package:named_mode/named_mode.dart';
+```
+
 ## Usage
 
-A simple usage example:
+This library can help you to solve name-transform problem easily
+
+Now support 5 named mode, using string `"an apple"` as example
++ an_apple
++ AN_APPLE
++ An_Apple
++ anApple
++ AnApple
+
+### Resolve named-mode of a string
+use
+```dart
+NamedMode namedMode = resolveNamedMode(your_string);
+```
+or
+```dart
+NamedMode namedMode = NamedMode.parseOn(your_string);
+```
+
+### Split a string by named-mode
+use specific named-mode to split string
+```dart
+List<String> segments = NamedMode.an_apple.split(your_string);
+```
+or split string by resolving named-mode automatically
+```dart
+List<String> segments = autoSplit(your_string);
+```
+you can also specific top-level named-mode to split string recursively
+
+example: 
+
+string "an_bigApple_TooBig_ApplePie" can be split recursively to \[an, big, Apple, Too, Big, Apple, Pie\] by this code
+```dart
+autoSplit("an_bigApple_TooBig_ApplePie", parentNamedMode: NamedMode.AN_APPLE);
+```
+if you disable recursive then will get \[an, bigApple, TooBig, ApplePie\]
+
+
+### Combine the split string
+use
+```dart
+combineWithNamedMode(your_segments, NamedMode.an_apple);
+```
+
+
+### A simple usage example:
 
 ```dart
 import 'package:named_mode/named_mode.dart';

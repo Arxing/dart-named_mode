@@ -1,5 +1,3 @@
-import 'dart:math';
-
 class NamedMode {
   final String _value;
   final String _name;
@@ -52,27 +50,21 @@ class NamedMode {
     return [];
   }
 
-  ///
   static const String _an_apple = '^($_ANY_WORD_BEGIN_NOT_NUMBER)(_$_ANY_WORD)*\$';
   static const an_apple = NamedMode._(_an_apple, 'an_apple', 50);
 
-  ///
   static const String _AN_APPLE = '^($_UPPER_WORD)(_$_UPPER_WORD)*\$';
   static const AN_APPLE = NamedMode._(_AN_APPLE, 'AN_APPLE', 80);
 
-  ///
   static const String _An_Apple = '^($_FIRST_UPPER_WORD)(_$_FIRST_UPPER_WORD*)*\$';
   static const An_Apple = NamedMode._(_An_Apple, 'An_Apple', 70);
 
-  ///
   static const String _anApple = '^($_LOWER_WORD)($_FIRST_UPPER_WORD)*\$';
   static const anApple = NamedMode._(_anApple, 'anApple', 90);
 
-  ///
   static const String _AnApple = '^($_FIRST_UPPER_WORD)+\$';
   static const AnApple = NamedMode._(_AnApple, 'AnApple', 100);
 
-  ///
   static const String _unknown = '';
   static const unknown = NamedMode._(_unknown, 'unknown', 0);
 }
@@ -146,13 +138,11 @@ String combineWithNamedMode(List<String> segments, NamedMode mode) {
     case NamedMode.anApple:
       return segments.length == 1
           ? replaceFirstChar(segments[0], toUpper: false)
-          : replaceFirstChar(segments[0], toUpper: false) +
-              segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
+          : replaceFirstChar(segments[0], toUpper: false) + segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
     case NamedMode.AnApple:
       return segments.length == 1
           ? replaceFirstChar(segments[0], toUpper: true)
-          : replaceFirstChar(segments[0], toUpper: true) +
-              segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
+          : replaceFirstChar(segments[0], toUpper: true) + segments.skip(1).map((o) => replaceFirstChar(o, toUpper: true)).join('');
   }
   return null;
 }

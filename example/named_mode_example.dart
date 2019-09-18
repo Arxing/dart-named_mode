@@ -47,4 +47,8 @@ main() {
   print(combineWithNamedMode(segments, NamedMode.An_Apple)); // This_Is_A_Book
   print(combineWithNamedMode(segments, NamedMode.anApple)); // thisIsABook
   print(combineWithNamedMode(segments, NamedMode.AnApple)); // ThisIsABook
+
+  var s = "an_bigApple_TooBig_ApplePie";
+  print(autoSplit(s, parentNamedMode: NamedMode.AN_APPLE)); // [an, big, Apple, Too, Big, Apple, Pie]
+  print(autoSplit(s, parentNamedMode: NamedMode.AN_APPLE, recursive: false)); // [an, bigApple, TooBig, ApplePie]
 }
